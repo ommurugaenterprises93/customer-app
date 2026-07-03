@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Print.Market - Clean, premium customer application for on-demand high-fidelity printing.">
+  <title>Print.Market | Premium Print Ordering</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header Navigation -->
+    <header class="header" id="app-header" style="display: none;">
+      <div class="header-inner">
+        <div class="logo" id="nav-logo">
+          PRINT<span>.MARKET</span>
+        </div>
+        <nav>
+          <ul class="nav-links">
+            <li><a class="nav-link active" data-screen="home">Home</a></li>
+            <li><a class="nav-link" data-screen="upload">Order a Print</a></li>
+            <li><a class="nav-link" data-screen="freelancers">Freelancers</a></li>
+            <li><a class="nav-link" data-screen="history">My Orders</a></li>
+            <li><a class="nav-link" data-screen="admin">Admin Panel</a></li>
+          </ul>
+        </nav>
+        <div class="user-menu">
+          <span class="phone-badge" id="user-phone-badge"></span>
+          <button class="btn-logout" id="btn-logout">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ================= AUTHENTICATION SCREEN ================= -->
+      <section class="screen active" id="screen-auth">
+        <div class="auth-screen-container">
+          <div class="auth-card">
+            <div class="logo" style="justify-content: center; font-size: 26px; margin-bottom: 24px;">
+              PRINT<span>.MARKET</span>
+            </div>
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Enter your phone number to sign in or create an account</p>
+            
+            <form id="auth-form" onsubmit="return false;">
+              <!-- Phone Number Input -->
+              <div class="form-group" id="phone-group">
+                <label class="form-label" for="phone-input">Phone Number</label>
+                <input class="form-input" type="tel" id="phone-input" placeholder="+1 (555) 012-3456" required autocomplete="tel">
+              </div>
+
+              <!-- OTP Code Input (hidden initially) -->
+              <div class="form-group" id="otp-group" style="display: none;">
+                <label class="form-label" for="otp-input">Verification Code (OTP)</label>
+                <input class="form-input" type="text" id="otp-input" placeholder="Enter 4-digit code" maxlength="4" autocomplete="one-time-code">
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: left;">
+                  Test mode: Enter any 4 numbers (e.g. 1234)
+                </p>
+              </div>
+
+              <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" id="btn-auth-submit">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HOME SCREEN ================= -->
+      <section class="screen" id="screen-home">
+        <div class="welcome-hero">
+          <div class="welcome-text">
+            <h1>On-Demand High Quality Printing</h1>
+            <p>
+              Upload documents, configure finishes, check resolutions, and order custom high-fidelity prints in seconds. Connect directly with designers if you need layout adjustments.
+            </p>
+            <button class="btn btn-primary" id="btn-hero-order">Order a Print Now</button>
+          </div>
+          <div>
+            <img class="hero-image" src="print_hero_banner.jpg" alt="Print.Market Banner">
+          </div>
+        </div>
+
+        <div class="entry-grid">
+          <div class="entry-card" id="card-entry-order">
+            <div class="entry-icon">🖨️</div>
+            <div>
+              <h2>Order a Print</h2>
+              <p>Upload PDFs or images, choose custom papers, matte/glossy laminations, binding structures, and get live prices.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 16px;">Configure specs</button>
+          </div>
+
+          <div class="entry-card" id="card-entry-freelancers">
+            <div class="entry-icon">🎨</div>
+            <div>
+              <h2>Freelance Designers</h2>
+              <p>Browse our curated directory of print layout specialists, logo designers, and illustrators to coordinate custom layouts.</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 16px;">View directory</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WIZARD SCREEN 1: UPLOAD ================= -->
+      <section class="screen" id="screen-upload">
+        <div class="wizard-header">
+          <div class="wizard-title">
+            <h2>Upload Print File</h2>
+            <p>Upload the document or high-resolution graphic you want printed</p>
+          </div>
+          <div class="step-indicator">Step 1 of 4</div>
+        </div>
+
+        <div class="upload-zone" id="drop-zone">
+          <input type="file" id="file-input-raw" class="file-input" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, application/pdf">
+          <div class="upload-icon">📤</div>
+          <div class="upload-text">
+            <h3>Drag & drop your file here</h3>
+            <p>Supports PDF, JPEG, PNG, WebP, SVG (Max 50MB)</p>
+            <p style="margin-top: 12px; font-weight: 600; color: var(--primary);">Or browse files</p>
+          </div>
+        </div>
+
+        <!-- File Metadata Card (Hidden initially) -->
+        <div id="file-metadata-container" style="display: none;">
+          <div class="file-meta-card">
+            <div class="file-info-col">
+              <div class="file-thumb" id="file-preview-thumb">📄</div>
+              <div class="file-details">
+                <h4 id="meta-file-name">filename.pdf</h4>
+                <p><span id="meta-file-size">1.2 MB</span> • <span id="meta-file-type">PDF Document</span></p>
+                <p style="margin-top: 4px; font-weight: 500;" id="meta-file-dimensions"></p>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-reupload">Remove</button>
+          </div>
+
+          <!-- Warnings & Notes -->
+          <div id="resolution-warning-banner" class="banner banner-warning" style="display: none;">
+            <div class="banner-icon">⚠️</div>
+            <div>
+              <strong>Low Resolution Warning:</strong> Estimated DPI is <span id="warn-dpi-val"></span>. The print may appear pixelated. We recommend uploading files with higher pixel density or choosing a smaller paper size to hit at least 150 DPI.
+            </div>
+          </div>
+
+          <div id="color-warning-banner" class="banner banner-info" style="display: none;">
+            <div class="banner-icon">ℹ️</div>
+            <div>
+              <strong>RGB Color Space:</strong> Your file is in RGB color mode. Standard commercial printing uses the CMYK color space. Colors may look slightly muted or shift when converted on the press.
+            </div>
+          </div>
+
+          <div class="wizard-actions" style="margin-top: 32px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-primary" id="btn-upload-next">Next: Configure Print</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WIZARD SCREEN 2: CONFIGURE ================= -->
+      <section class="screen" id="screen-configure">
+        <div class="wizard-header">
+          <div class="wizard-title">
+            <h2>Configure Specifications</h2>
+            <p>Customize paper size, colors, number of copies, and premium finishes</p>
+          </div>
+          <div class="step-indicator">Step 2 of 4</div>
+        </div>
+
+        <div class="specs-layout">
+          <!-- Left Specs Selection Column -->
+          <div class="config-card">
+            
+            <!-- Paper Size Selection -->
+            <div class="config-section">
+              <h3 class="config-title">1. Paper Size</h3>
+              <div class="paper-grid" id="paper-sizes-grid">
+                <div class="paper-option selected" data-size="A4">
+                  <div class="paper-option-title">A4 Standard</div>
+                  <div class="paper-option-desc">8.3" × 11.7" • Documents & letters</div>
+                </div>
+                <div class="paper-option" data-size="A3">
+                  <div class="paper-option-title">A3 Poster</div>
+                  <div class="paper-option-desc">11.7" × 16.5" • Posters & displays</div>
+                </div>
+                <div class="paper-option" data-size="A5">
+                  <div class="paper-option-title">A5 Flyer</div>
+                  <div class="paper-option-desc">5.8" × 8.3" • Leaflets & booklets</div>
+                </div>
+                <div class="paper-option" data-size="Letter">
+                  <div class="paper-option-title">Letter</div>
+                  <div class="paper-option-desc">8.5" × 11.0" • Corporate standard</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Print Color Mode -->
+            <div class="config-section">
+              <h3 class="config-title">2. Color Mode</h3>
+              <div class="segmented-control" id="color-toggle-control">
+                <button class="segment-btn active" data-color="Color">Full Color</button>
+                <button class="segment-btn" data-color="B&W">Black & White</button>
+              </div>
+            </div>
+
+            <!-- Finishes Option checkboxes -->
+            <div class="config-section">
+              <h3 class="config-title">3. Premium Finishes</h3>
+              <div class="finishes-grid" id="finishes-grid">
+                <div class="checkbox-card" data-finish="Matte">
+                  <input type="checkbox" id="chk-finish-matte">
+                  <div class="checkbox-card-info">
+                    <span class="checkbox-label">Matte Coat</span>
+                    <span class="checkbox-price">+$0.20 / unit</span>
+                  </div>
+                </div>
+                <div class="checkbox-card" data-finish="Glossy">
+                  <input type="checkbox" id="chk-finish-glossy">
+                  <div class="checkbox-card-info">
+                    <span class="checkbox-label">Glossy Coat</span>
+                    <span class="checkbox-price">+$0.40 / unit</span>
+                  </div>
+                </div>
+                <div class="checkbox-card" data-finish="Lamination">
+                  <input type="checkbox" id="chk-finish-lamination">
+                  <div class="checkbox-card-info">
+                    <span class="checkbox-label">Lamination</span>
+                    <span class="checkbox-price">+$0.75 / unit</span>
+                  </div>
+                </div>
+                <div class="checkbox-card" data-finish="Binding">
+                  <input type="checkbox" id="chk-finish-binding">
+                  <div class="checkbox-card-info">
+                    <span class="checkbox-label">Comb Binding</span>
+                    <span class="checkbox-price">+$1.50 / unit</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stepper copies selection -->
+            <div class="config-section">
+              <h3 class="config-title">4. Quantity (Copies)</h3>
+              <div class="stepper-container">
+                <button class="btn-stepper" id="btn-qty-minus">−</button>
+                <span class="stepper-val" id="qty-value">1</span>
+                <button class="btn-stepper" id="btn-qty-plus">+</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Summary Panel -->
+          <div class="summary-card">
+            <h3 class="summary-title">Summary & Cost</h3>
+            
+            <div class="summary-row">
+              <span style="color: var(--text-muted);">Paper Size</span>
+              <strong id="summary-paper-val">A4 Standard</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: var(--text-muted);">Color Tone</span>
+              <strong id="summary-color-val">Full Color</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: var(--text-muted);">Quality Density</span>
+              <strong id="summary-dpi-val">300 DPI (Excellent)</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: var(--text-muted);">Finishes</span>
+              <strong id="summary-finishes-val">None</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: var(--text-muted);">Quantity</span>
+              <strong id="summary-qty-val">1 copy</strong>
+            </div>
+
+            <!-- Price details -->
+            <div style="border-top: 1px dashed var(--border); margin-top: 16px; padding-top: 16px;">
+              <div class="summary-row">
+                <span>Base Price</span>
+                <span id="price-base-val">$1.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Paper premium</span>
+                <span id="price-paper-val">$1.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Color premium</span>
+                <span id="price-color-val">$0.80</span>
+              </div>
+              <div class="summary-row">
+                <span>Finishes cost</span>
+                <span id="price-finishes-val">$0.00</span>
+              </div>
+              <div class="summary-row" style="font-weight: 600;">
+                <span>Subtotal (× <span id="subtotal-qty-val">1</span>)</span>
+                <span id="price-subtotal-val">$2.80</span>
+              </div>
+              <div class="summary-row">
+                <span>Sales Tax (8%)</span>
+                <span id="price-tax-val">$0.22</span>
+              </div>
+              <div class="summary-row total-row">
+                <span>Estimated Total</span>
+                <span class="summary-val-total" id="price-total-val">$3.02</span>
+              </div>
+            </div>
+
+            <!-- Warnings within details if low resolution -->
+            <div id="config-dpi-warning" style="display: none; background-color: var(--warning-light); border: 1px solid #fbcfe8; padding: 12px; border-radius: 8px; font-size: 11px; margin-top: 16px; color: #92400e;">
+              ⚠️ <strong>Resolution is below 150 DPI.</strong> Quality might be poor. Consider choosing a smaller paper size.
+            </div>
+
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <button class="btn btn-primary" id="btn-config-next">Next: Fulfillment Options</button>
+              <button class="btn btn-secondary" id="btn-config-back">Back</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WIZARD SCREEN 3: FULFILLMENT ================= -->
+      <section class="screen" id="screen-fulfilment">
+        <div class="wizard-header">
+          <div class="wizard-title">
+            <h2>Select Fulfillment Method</h2>
+            <p>Choose between local self-pickup or premium delivery to your address</p>
+          </div>
+          <div class="step-indicator">Step 3 of 4</div>
+        </div>
+
+        <div class="specs-layout">
+          <!-- Fulfillment Settings -->
+          <div class="config-card">
+            
+            <div class="config-section">
+              <h3 class="config-title">1. Fulfillment Type</h3>
+              <div class="segmented-control" id="fulfillment-toggle-control" style="margin-bottom: 24px;">
+                <button class="segment-btn active" data-type="Pickup">Self-Pickup (Free)</button>
+                <button class="segment-btn" data-type="Delivery">Home Delivery (+$3.99)</button>
+              </div>
+            </div>
+
+            <!-- Self-Pickup Options Block -->
+            <div class="config-section" id="pickup-options-section">
+              <h3 class="config-title">2. Select Pickup Location</h3>
+              <div class="address-grid">
+                <div class="address-option selected">
+                  <input type="radio" name="pickup-loc" checked id="loc-1">
+                  <div class="address-text">
+                    <strong>Central Printing Press Depot</strong><br>
+                    100 Broadway St, Manhattan, NY 10005 (Hours: 8 AM - 8 PM)
+                  </div>
+                </div>
+                <div class="address-option">
+                  <input type="radio" name="pickup-loc" id="loc-2">
+                  <div class="address-text">
+                    <strong>Creative District Print Hub</strong><br>
+                    320 Design Ave, Brooklyn, NY 11211 (Hours: 9 AM - 6 PM)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Address Block (Hidden initially) -->
+            <div class="config-section" id="delivery-options-section" style="display: none;">
+              <h3 class="config-title">2. Select Delivery Address</h3>
+              
+              <!-- Addresses list -->
+              <div class="address-grid" id="saved-addresses-list">
+                <!-- Injected via JavaScript -->
+              </div>
+
+              <!-- Add address trigger -->
+              <button class="btn btn-secondary btn-sm" id="btn-trigger-add-address" style="width: 100%;">
+                + Add New Delivery Address
+              </button>
+
+              <!-- Inline Add Address Form -->
+              <div class="add-address-form" id="add-address-form-box" style="display: none;">
+                <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 12px;">Add New Address</h4>
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label class="form-label" for="txt-new-address">Street Address, Apt/Suite, City, State, ZIP</label>
+                  <textarea class="form-input" id="txt-new-address" rows="3" placeholder="e.g. 123 Main St, Apt 4B, New York, NY 10001" style="resize: none;"></textarea>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <button class="btn btn-secondary btn-sm" id="btn-cancel-address">Cancel</button>
+                  <button class="btn btn-primary btn-sm" id="btn-save-address">Save Address</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Summary Panel -->
+          <div class="summary-card">
+            <h3 class="summary-title">Summary & Cost</h3>
+            
+            <div class="summary-row">
+              <span>Item Specifications</span>
+              <strong id="fulfillment-specs-summary">A4, Full Color</strong>
+            </div>
+            <div class="summary-row">
+              <span>Fulfillment</span>
+              <strong id="fulfillment-method-summary">Self-Pickup (Free)</strong>
+            </div>
+            <div class="summary-row">
+              <span>Destination</span>
+              <strong id="fulfillment-destination-summary" style="max-width: 180px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Central Press Depot</strong>
+            </div>
+
+            <div style="border-top: 1px dashed var(--border); margin-top: 16px; padding-top: 16px;">
+              <div class="summary-row">
+                <span>Print Subtotal</span>
+                <span id="fulfillment-subtotal-val">$2.80</span>
+              </div>
+              <div class="summary-row">
+                <span>Fulfillment Cost</span>
+                <span id="fulfillment-delivery-val">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Sales Tax</span>
+                <span id="fulfillment-tax-val">$0.22</span>
+              </div>
+              <div class="summary-row total-row">
+                <span>Final Total</span>
+                <span class="summary-val-total" id="fulfillment-total-val">$3.02</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <button class="btn btn-primary" id="btn-fulfillment-next">Next: Review & Payment</button>
+              <button class="btn btn-secondary" id="btn-fulfillment-back">Back</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WIZARD SCREEN 4: PAYMENT / REVIEW ================= -->
+      <section class="screen" id="screen-payment">
+        <div class="wizard-header">
+          <div class="wizard-title">
+            <h2>Review & Place Order</h2>
+            <p>Verify specifications and execute secure mock checkout</p>
+          </div>
+          <div class="step-indicator">Step 4 of 4</div>
+        </div>
+
+        <div class="specs-layout">
+          <!-- Item Details and Payment Mock Inputs -->
+          <div class="config-card">
+            
+            <!-- Order Specs Breakdown -->
+            <div class="config-section" style="border-bottom: 1px solid var(--border); padding-bottom: 24px;">
+              <h3 class="config-title">Order Specifications</h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px;">
+                <div>
+                  <span style="color: var(--text-muted);">File Name:</span><br>
+                  <strong id="rev-file-name">poster.jpg</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted);">Paper Size:</span><br>
+                  <strong id="rev-paper-size">A4 Standard</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted);">Color Tone:</span><br>
+                  <strong id="rev-color">Full Color</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted);">DPI Quality:</span><br>
+                  <strong id="rev-dpi">300 DPI</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted);">Quantity:</span><br>
+                  <strong id="rev-qty">1 Copy</strong>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted);">Finishes:</span><br>
+                  <strong id="rev-finishes">Glossy Coat</strong>
+                </div>
+                <div style="grid-column: span 2;">
+                  <span style="color: var(--text-muted);">Fulfillment Details:</span><br>
+                  <strong id="rev-fulfillment">Delivery - 456 Editorial Way, NY 10013</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment gateway input -->
+            <div class="config-section" style="margin-top: 24px;">
+              <h3 class="config-title">Mock Payment Details</h3>
+              
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;">
+                <div style="grid-column: span 3; margin-bottom: 8px;">
+                  <label class="form-label" for="card-num">Card Number</label>
+                  <input class="form-input" type="text" id="card-num" value="4111 2222 3333 4444" placeholder="Card Number" disabled>
+                </div>
+                <div>
+                  <label class="form-label" for="card-expiry">Expiry</label>
+                  <input class="form-input" type="text" id="card-expiry" value="09/29" placeholder="MM/YY" disabled>
+                </div>
+                <div>
+                  <label class="form-label" for="card-cvv">CVV</label>
+                  <input class="form-input" type="text" id="card-cvv" value="123" placeholder="123" disabled>
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                  <p style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">
+                    Payments are simulated for testing purposes. No real charges are made.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Summary and Checkout Button -->
+          <div class="summary-card">
+            <h3 class="summary-title">Payment Due</h3>
+            
+            <div id="checkout-pricing-breakdown">
+              <!-- Dynamically populated review costs -->
+            </div>
+
+            <div style="background-color: var(--primary-light); padding: 12px; border-radius: 8px; font-size: 12px; margin-top: 20px; border: 1px solid var(--primary-border);">
+              ℹ️ <strong>Cancellation Guarantee:</strong> You can cancel this order at any time until printing starts. Read the full <a class="footer-link" id="link-policy-cancellation" style="text-decoration: underline; font-weight: bold;">Cancellation & Refund Policy</a>.
+            </div>
+
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+              <button class="btn btn-primary" id="btn-pay-now" style="gap: 8px;">
+                💳 Pay Now & Place Order
+              </button>
+              <button class="btn btn-secondary" id="btn-pay-back">Back</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ORDER TRACKING SCREEN ================= -->
+      <section class="screen" id="screen-tracking">
+        <div class="tracking-layout">
+          <div class="tracking-header">
+            <div class="tracking-id" id="track-order-id">ORD-987654</div>
+            <div class="tracking-summary">
+              <h3>Order Tracking</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Placed on: <span id="track-order-date">July 3, 2026</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Status badge indicator -->
+          <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600;">Current Status:</span>
+            <span class="status-badge" id="track-status-badge">Placed</span>
+          </div>
+
+          <!-- Timeline -->
+          <div class="timeline" id="tracking-timeline">
+            <!-- Steps are dynamically injected/updated via app.js -->
+            <div class="timeline-step" id="step-placed">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Placed</span>
+                <span class="timeline-time" id="time-placed">-</span>
+              </div>
+            </div>
+
+            <div class="timeline-step" id="step-payment-confirmed">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Payment Confirmed</span>
+                <span class="timeline-time" id="time-payment-confirmed">-</span>
+              </div>
+            </div>
+
+            <div class="timeline-step" id="step-vendor-accepted">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Vendor Accepted</span>
+                <span class="timeline-time" id="time-vendor-accepted">-</span>
+              </div>
+            </div>
+
+            <div class="timeline-step" id="step-printing">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Printing</span>
+                <span class="timeline-time" id="time-printing">-</span>
+              </div>
+            </div>
+
+            <div class="timeline-step" id="step-ready">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Ready</span>
+                <span class="timeline-time" id="time-ready">-</span>
+              </div>
+            </div>
+
+            <div class="timeline-step" id="step-delivered">
+              <div class="timeline-node"></div>
+              <div class="timeline-content">
+                <span class="timeline-label">Delivered / Collected</span>
+                <span class="timeline-time" id="time-delivered">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action buttons block -->
+          <div style="border-top: 1px solid var(--border); padding-top: 24px; text-align: center;">
+            <div class="tooltip-container">
+              <span class="tooltip-text" id="cancel-tooltip-text">Cannot cancel — order is already printing</span>
+              <button class="btn btn-danger" id="btn-cancel-order" style="width: 100%;">
+                Cancel Order
+              </button>
+            </div>
+            
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 12px; line-height: 1.4;">
+              * Cancel option is only available before vendor advances order status to "Printing".
+            </p>
+          </div>
+
+          <!-- Details grid -->
+          <div style="margin-top: 32px; background-color: var(--bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); text-align: left; font-size: 13px;">
+            <h4 style="font-weight: 700; margin-bottom: 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em;">Order Details</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>Paper Size: <strong id="track-paper">A4</strong></div>
+              <div>Tone: <strong id="track-color">Color</strong></div>
+              <div>Quality: <strong id="track-dpi">300 DPI</strong></div>
+              <div>Quantity: <strong id="track-qty">1 Copy</strong></div>
+              <div style="grid-column: span 2;">Finishes: <strong id="track-finishes">Glossy Coat</strong></div>
+              <div style="grid-column: span 2;">Fulfillment: <strong id="track-fulfilment">Self-Pickup</strong></div>
+              <div style="grid-column: span 2; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; display: flex; justify-content: space-between;">
+                <span>Total amount paid:</span>
+                <strong style="color: var(--primary); font-size: 15px;" id="track-total">$3.02</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; gap: 12px;">
+            <button class="btn btn-secondary" style="flex: 1;" id="btn-tracking-history">View Order History</button>
+            <button class="btn btn-secondary" style="flex: 1;" id="btn-tracking-simulator">Advance Status (Admin)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ORDER HISTORY SCREEN ================= -->
+      <section class="screen" id="screen-history">
+        <div class="freelancer-section-header">
+          <h2>Order History</h2>
+          <p>Manage active trackings, download past printable invoices, submit ratings, and report incorrect products</p>
+        </div>
+
+        <div id="orders-list-container" class="orders-list">
+          <!-- Populated dynamically with JavaScript -->
+          <div style="text-align: center; padding: 48px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); color: var(--text-muted);">
+            No orders found yet. <span style="color: var(--primary); cursor: pointer; text-decoration: underline;" id="history-order-trigger">Place your first order</span>.
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FREELANCE DESIGNERS SCREEN ================= -->
+      <section class="screen" id="screen-freelancers">
+        <div class="freelancer-section-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+          <div>
+            <h2>Freelance Designers</h2>
+            <p>
+              Connect directly with expert layout artists, designers, and illustrators to format or redesign your prints. Call them directly to coordinate.
+            </p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-admin-manage-freelancers">Manage Profiles</button>
+        </div>
+
+        <div class="designer-grid" id="designer-directory-grid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </section>
+
+      <!-- ================= POLICY PAGE SCREEN ================= -->
+      <section class="screen" id="screen-policy">
+        <div class="policy-container">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px;">
+            <h1 style="margin: 0;">Cancellation & Refund Policy</h1>
+            <button class="btn btn-secondary btn-sm" onclick="history.back();" id="btn-policy-close">Go Back</button>
+          </div>
+
+          <div class="policy-section">
+            <h2>Cancellation Policy</h2>
+            <p>
+              We believe in giving our customers flexibility. Our cancellation rules are automatically enforced in our production pipeline:
+            </p>
+            <ul>
+              <li><strong>Eligible for Cancel:</strong> Customers can cancel orders directly from their tracking dashboard at any time during the <strong>Placed</strong>, <strong>Payment Confirmed</strong>, or <strong>Vendor Accepted</strong> phases. Cancellation instantly triggers a full refund.</li>
+              <li><strong>Ineligible for Cancel:</strong> Once the print vendor marks the order as <strong>Printing</strong>, the physical print process has begun. The cancel button will automatically lock, and order cancellation is no longer possible.</li>
+            </ul>
+          </div>
+
+          <div class="policy-section">
+            <h2>Refund & Product Issues Policy</h2>
+            <p>
+              Since prints are custom manufactured to specifications, refunds are only issued if the delivered product does not match your upload or specifications.
+            </p>
+            <ul>
+              <li>Refund requests can only be initiated on orders that have reached the <strong>Delivered</strong> or <strong>Collected</strong> status.</li>
+              <li>To request a refund, go to <strong>My Orders</strong>, locate the order, and click the <strong>Report Wrong Product</strong> button.</li>
+              <li>You must fill out the form specifying the exact issue and upload a photograph demonstrating the defect/error.</li>
+              <li>Once submitted, the order shifts to a <strong>Refund Requested</strong> status for vendor administration review.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ADMIN PANEL SCREEN ================= -->
+      <section class="screen" id="screen-admin">
+        <div class="freelancer-section-header">
+          <h2>Admin Simulator & Database Console</h2>
+          <p>
+            Simulate vendor fulfillment operations, progress order stages, view system metrics, and manage the freelance designers directory.
+          </p>
+        </div>
+
+        <div class="admin-layout">
+          <!-- 1. Order Fulfillment Simulation -->
+          <div class="admin-card">
+            <h3 class="admin-section-title">
+              Fulfillment Simulator (Vendor Controls)
+              <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">Simulate vendor actions in real-time</span>
+            </h3>
+            
+            <div style="overflow-x: auto;">
+              <table class="admin-orders-table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Order ID</th>
+                    <th style="text-align: left;">File Info</th>
+                    <th style="text-align: left;">Fulfillment</th>
+                    <th style="text-align: left;">Total</th>
+                    <th style="text-align: left;">Current Status</th>
+                    <th style="text-align: left;">Action / Simulator State</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-orders-table-body">
+                  <!-- Dynamically injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 2. Freelancer Database Management -->
+          <div class="admin-card">
+            <h3 class="admin-section-title">
+              Manage Freelance Designer Database
+              <button class="btn btn-primary btn-sm" id="btn-admin-add-freelancer">+ Create Designer Profile</button>
+            </h3>
+
+            <div style="overflow-x: auto;">
+              <table class="freelancer-list-table">
+                <thead>
+                  <tr>
+                    <th>Avatar</th>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Phone Number</th>
+                    <th style="text-align: right;">Operations</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-freelancers-table-body">
+                  <!-- Dynamically injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="app-footer">
+      <div class="footer-links">
+        <a class="footer-link" id="footer-link-order">Order a Print</a>
+        <a class="footer-link" id="footer-link-freelancers">Freelance Directory</a>
+        <a class="footer-link" id="footer-link-history">Order History</a>
+        <a class="footer-link" id="footer-link-policy">Cancellation & Refund Policy</a>
+        <a class="footer-link" id="footer-link-admin">Admin Dashboard</a>
+      </div>
+      <p style="margin-top: 16px;">© 2026 Print.Market. Powered by High-Fidelity Client Engine. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- ================= MODALS SECTION ================= -->
+  
+  <!-- 1. Star Rating Modal -->
+  <div class="modal-overlay" id="modal-rating-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="btn-close-rating">&times;</button>
+      <h3 class="modal-title">Rate Your Order</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        Let us know how your print turned out. Your feedback helps vendors improve quality.
+      </p>
+
+      <div class="star-rating" id="rating-stars-container">
+        <span class="star" data-rating="1">★</span>
+        <span class="star" data-rating="2">★</span>
+        <span class="star" data-rating="3">★</span>
+        <span class="star" data-rating="4">★</span>
+        <span class="star" data-rating="5">★</span>
+      </div>
+
+      <div class="form-group" style="margin-top: 24px;">
+        <label class="form-label" for="txt-rating-comments">Review Comments (Optional)</label>
+        <textarea class="form-input" id="txt-rating-comments" rows="3" placeholder="Describe quality, packaging, and delivery time..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-submit-rating">
+        Submit Rating
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Report Wrong Product / Refund Modal -->
+  <div class="modal-overlay" id="modal-refund-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="btn-close-refund">&times;</button>
+      <h3 class="modal-title">Report Wrong Product</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        If you received a defective print, wrong file, or incorrect size, submit a claim below for administrative refund review.
+      </p>
+
+      <form id="refund-form" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label" for="select-refund-reason">Issue Category</label>
+          <select class="form-input" id="select-refund-reason" required>
+            <option value="">-- Choose Reason --</option>
+            <option value="Incorrect File Printed">Incorrect File Printed</option>
+            <option value="Wrong Paper Size">Wrong Paper Size</option>
+            <option value="Incorrect Finishes Applied">Incorrect Finishes Applied (e.g. Gloss instead of Matte)</option>
+            <option value="Severe Printing Flaws">Severe Printing Flaws (e.g. alignment, color bands)</option>
+            <option value="Physical Damage">Damage during shipment/packaging</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="txt-refund-desc">Detailed Description of Defect</label>
+          <textarea class="form-input" id="txt-refund-desc" rows="3" placeholder="Provide specific details about the printing error..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Upload Proof (Photo of Defective Print)</label>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-refund-upload-trigger" style="width: 100%;">
+            📸 Select Photo Proof
+          </button>
+          <input type="file" id="refund-file-input" style="display: none;" accept="image/*">
+          <img class="refund-preview-img" id="refund-preview-img-box" alt="Defect Proof Preview">
+        </div>
+
+        <button class="btn btn-danger" style="width: 100%; margin-top: 16px;" id="btn-submit-refund">
+          Submit Issue & Request Refund
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add/Edit Freelancer Profile Modal -->
+  <div class="modal-overlay" id="modal-freelancer-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="btn-close-freelancer">&times;</button>
+      <h3 class="modal-title" id="freelancer-modal-title">Create Designer Profile</h3>
+      
+      <form id="freelancer-form" onsubmit="return false;">
+        <input type="hidden" id="freelancer-edit-id">
+
+        <div class="form-group">
+          <label class="form-label" for="fl-name">Full Name</label>
+          <input class="form-input" type="text" id="fl-name" placeholder="e.g. Sarah Jenkins" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fl-specialization">Specialization / Skills</label>
+          <input class="form-input" type="text" id="fl-specialization" placeholder="e.g. Logo Design, Illustrations, Flyers" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fl-bio">Short Professional Bio</label>
+          <textarea class="form-input" id="fl-bio" rows="3" placeholder="Describe design expertise, experience, and style..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fl-phone">Contact Phone Number</label>
+          <input class="form-input" type="tel" id="fl-phone" placeholder="e.g. +1 555-0143" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fl-photo">Photo URL</label>
+          <input class="form-input" type="url" id="fl-photo" placeholder="https://images.unsplash.com/photo-..." required>
+          <p style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+            Tip: You can use standard Unsplash URLs, e.g., https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&q=80
+          </p>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="btn-submit-freelancer">
+          Save Profile
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="utils.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
